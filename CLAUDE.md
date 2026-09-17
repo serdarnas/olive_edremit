@@ -13,6 +13,8 @@
 - **dinleyici** (`bin/telegram_dinle.py`) — bota mesaj düştüğü an x-icerik koşar; olay tetikli, zamanlayıcısız.
 - **günlük** (`bin/gunluk.py`) — sabah 09:00 dağıtıcıyı koşturup rapor yazar, akşam 22:00 günü denetler.
   Zamanlayıcıyı `bin/zamanla.py --kur` kurar (launchd); raporlar `sirket-log/rapor/` altında, dışarı gitmez.
+- **wiki/** — takımlardan bağımsız, insan yönlendirmesinde büyüyen kalıcı iş bilgi tabanı (ürünler,
+  marka algısı, rakipler, pazar notları). Zamanlanmış koşusu yok; bkz. `wiki/SEMA.md`.
 
 Döngü kapalı, ama **yayın düğmesi insanda**: hiçbir takım sosyal hesaba yazmaz, mail atmaz,
 yorum bırakmaz — taslağa kadar gider ve durur.
@@ -32,6 +34,7 @@ sirket-log/rapor/     sabah raporu ve akşam denetimi — git'e girmez
 takimlar/<takim>/     takim.md · kurallar.md · defter.md · durum.json · kosu/ · cikti/
 skills/<ad>/SKILL.md  yetenekler — her birinde kaynak ve lisans yazar
 sirket/               AJAN-KIMLIGI.md · YETENEKLER.md
+wiki/                 kaynaklar/ (ham, değişmez) · sayfalar/ (LLM üretir) · index.md · log.md · SEMA.md
 .env                  anahtarlar — asla commit'e girmez
 ```
 `defter.md` ajanındır (ders yazar), `kurallar.md` insanın. Koşu kaydı `kosu/`, ürün `cikti/`.
