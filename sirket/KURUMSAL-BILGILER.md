@@ -36,6 +36,12 @@
   — ürün, fiyat, stok, kategori, görsel verisi buradan gelir. `bin/urun_veri_cek.py` bu adresi
   `NIDA_XML_URL` üzerinden okur.
 
+## Üçüncü taraf araç lisans notu
+- **Remotion** (`video-uretici/`, gelişmiş ürün videosu — fiyat etiketi + altyazı): ücretsiz
+  kullanım sınırı **3 çalışana kadar** şirketler içindir. Şirket büyürse
+  [remotion.pro/license](https://www.remotion.pro/license)'dan ücretli Company License gerekip
+  gerekmediği kontrol edilmeli.
+
 ## Kullanım notu
 - Reklam/gönderi metninde yasal ibare veya iletişim bilgisi gerektiğinde (ör. "Vergi No", telefon,
   adres) değer buradan alınır, ajan tarafından tahmin edilmez.

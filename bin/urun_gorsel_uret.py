@@ -8,7 +8,8 @@ Kullanım (isteğe bağlı seslendirmeyle):
   python3 bin/urun_gorsel_uret.py <kod> <veri/YYYY-Www.json> <cikti-onek> --anlatim "<metin>"
 
 Çıktı: <cikti-onek>-1x1.jpg, -4x5.jpg, -9x16.jpg, -video.mp4, (FAL_KEY varsa) -9x16-sahne.jpg,
-(--anlatim + edge-tts kuruluysa) -seslendirme.mp3 (ve videoya sesli olarak eklenir)
+(--anlatim + edge-tts kuruluysa) -seslendirme.mp3 + -altyazi.srt (ses videoya eklenir; SRT ise
+`bin/urun_video_render.py` (Remotion) tarafından kelime-kelime altyazı için okunur)
 
 Deterministik kısım (fotoğraf kırpma + video) her zaman çalışır, hiçbir üretken model kullanmaz —
 yalnız beslemedeki gerçek fotoğraflar kırpılır/birleştirilir. Yalnız **sahne** (arka plan) katmanı
@@ -101,14 +102,18 @@ def formatlari_uret(fotograf_yollari, cikti_onek):
 
 
 def sesli_anlatim_uret(metin, cikti_onek, ses="tr-TR-EmelNeural"):
-    """`edge-tts` (MIT, ücretsiz, API anahtarı gerekmez) ile Türkçe seslendirme üretir. Metni
-    script asla uydurmaz — yalnız `metin` parametresiyle verileni okur. `edge-tts` kurulu
-    değilse ya da üretim başarısız olursa None döner — sessizce atlanır."""
+    """`edge-tts` (MIT, ücretsiz, API anahtarı gerekmez) ile Türkçe seslendirme + kelime zamanlı
+    altyazı (.srt) üretir — `bin/urun_video_render.py`'nin (Remotion) kelime-kelime altyazısı
+    bunu okur, ekstra maliyeti yoktur. Metni script asla uydurmaz — yalnız `metin` parametresiyle
+    verileni okur. `edge-tts` kurulu değilse ya da üretim başarısız olursa None döner — sessizce
+    atlanır."""
     if not metin or not shutil.which("edge-tts"):
         return None
     yol = f"{cikti_onek}-seslendirme.mp3"
+    srt_yol = f"{cikti_onek}-altyazi.srt"
     Path(yol).parent.mkdir(parents=True, exist_ok=True)
-    komut = ["edge-tts", "--voice", ses, "--text", metin, "--write-media", yol]
+    komut = ["edge-tts", "--voice", ses, "--text", metin, "--write-media", yol,
+             "--write-subtitles", srt_yol]
     try:
         calisti = subprocess.run(komut, capture_output=True, timeout=30)
     except (subprocess.TimeoutExpired, OSError):
@@ -201,18 +206,21 @@ def _istek(url, veri=None):
 
 
 def _sahne_bekle(is_, sure=BEKLEME_SN):
+    """Kuyruğu yoklar. `urllib.error.HTTPError` da `URLError`'ın alt sınıfı olduğu için tek
+    except bloğu her iki `_istek` çağrısını da (durum + sonuç) kapsar — fal.ai geçici bir hata
+    (ör. 403/5xx) döndürürse script çökmez, None ile sessizce atlanır."""
     biter = time.time() + sure
     while time.time() < biter:
         try:
-            durum = _istek(is_["status_url"]).get("status")
+            durum_yaniti = _istek(is_["status_url"])
+            durum = durum_yaniti.get("status")
+            if durum == "COMPLETED":
+                sonuc = _istek(is_["response_url"])
+                return (sonuc.get("images") or [{}])[0].get("url")
+            if durum in ("FAILED", "ERROR"):
+                return None
         except (urllib.error.URLError, OSError, ValueError, KeyError):
-            time.sleep(4)
-            continue
-        if durum == "COMPLETED":
-            sonuc = _istek(is_["response_url"])
-            return (sonuc.get("images") or [{}])[0].get("url")
-        if durum in ("FAILED", "ERROR"):
-            return None
+            pass
         time.sleep(4)
     return None
 

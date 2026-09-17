@@ -1,0 +1,16 @@
+{
+  "name": "video-uretici",
+  "private": true,
+  "type": "module",
+  "description": "Nida Zeytin ürün videolarına animasyonlu fiyat etiketi + kelime-kelime altyazı ekleyen Remotion projesi. bin/urun_video_render.py buradan çağırır.",
+  "scripts": {
+    "render": "remotion render src/index.jsx UrunVideosu out.mp4"
+  },
+  "dependencies": {
+    "@remotion/captions": "^4.0.526",
+    "@remotion/cli": "^4.0.526",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.526"
+  }
+}

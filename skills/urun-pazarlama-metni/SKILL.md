@@ -54,6 +54,8 @@ Sahne: <sahne dosyası ya da "atlandı"> — üretildiyse "yayından önce gözd
   silme kusurlu olabilir)" notunu ekle
 Seslendirme: <mp3 dosyası ya da "atlandı"> — üretildiyse videoya zaten eklenmiştir, ayrıca not
   gerekmez
+Gelişmiş video: <video-gelismis dosyası ya da "atlandı"> — animasyonlu fiyat/indirim etiketi ve
+  (varsa) kelime-kelime altyazı; Node/Remotion kurulu değilse normal "atlandı"
 
 İncele: nidazeytin.com
 ```
