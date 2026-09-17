@@ -4,7 +4,11 @@
 Kullanım:
   python3 bin/urun_gorsel_uret.py <kod> <veri/YYYY-Www.json> <cikti-onek>
 
-Çıktı: <cikti-onek>-1x1.jpg, -4x5.jpg, -9x16.jpg, -video.mp4, (FAL_KEY varsa) -9x16-sahne.jpg
+Kullanım (isteğe bağlı seslendirmeyle):
+  python3 bin/urun_gorsel_uret.py <kod> <veri/YYYY-Www.json> <cikti-onek> --anlatim "<metin>"
+
+Çıktı: <cikti-onek>-1x1.jpg, -4x5.jpg, -9x16.jpg, -video.mp4, (FAL_KEY varsa) -9x16-sahne.jpg,
+(--anlatim + edge-tts kuruluysa) -seslendirme.mp3 (ve videoya sesli olarak eklenir)
 
 Deterministik kısım (fotoğraf kırpma + video) her zaman çalışır, hiçbir üretken model kullanmaz —
 yalnız beslemedeki gerçek fotoğraflar kırpılır/birleştirilir. Yalnız **sahne** (arka plan) katmanı
@@ -12,6 +16,11 @@ yalnız beslemedeki gerçek fotoğraflar kırpılır/birleştirilir. Yalnız **s
 zaman yapay zekayla çizilmez/değiştirilmez (bkz. `bin/kapak_uret.py`, aynı ilke: AI yalnız zemin
 çizer). `FAL_KEY` yoksa, üretim başarısız/zaman aşımına uğrarsa ya da `ffmpeg` yoksa ilgili adım
 sessizce atlanır — koşu bloklanmaz, çıktıda "atlandı" notuyla devam eder.
+
+Seslendirme `edge-tts` (MIT, ücretsiz, API anahtarı gerekmez — `pip install edge-tts`) ile
+üretilir; bu projedeki `pip install` gerektiren ikinci istisna (birincisi Pillow), aynı nazik-atlama
+deseniyle: kurulu değilse "atlandı" notuyla sessiz video üretilmeye devam eder. **Metni script
+uydurmaz** — `--anlatim` ile verilen metin okunur, başka hiçbir cümle eklenmez.
 """
 import json
 import os
@@ -91,17 +100,54 @@ def formatlari_uret(fotograf_yollari, cikti_onek):
     return sonuc
 
 
-def video_uret(fotograf_yollari, cikti_onek):
+def sesli_anlatim_uret(metin, cikti_onek, ses="tr-TR-EmelNeural"):
+    """`edge-tts` (MIT, ücretsiz, API anahtarı gerekmez) ile Türkçe seslendirme üretir. Metni
+    script asla uydurmaz — yalnız `metin` parametresiyle verileni okur. `edge-tts` kurulu
+    değilse ya da üretim başarısız olursa None döner — sessizce atlanır."""
+    if not metin or not shutil.which("edge-tts"):
+        return None
+    yol = f"{cikti_onek}-seslendirme.mp3"
+    Path(yol).parent.mkdir(parents=True, exist_ok=True)
+    komut = ["edge-tts", "--voice", ses, "--text", metin, "--write-media", yol]
+    try:
+        calisti = subprocess.run(komut, capture_output=True, timeout=30)
+    except (subprocess.TimeoutExpired, OSError):
+        return None
+    return yol if calisti.returncode == 0 and Path(yol).exists() else None
+
+
+def _ses_suresi(yol):
+    """`ffprobe` ile saniye cinsinden ses süresi; okunamazsa None."""
+    if not shutil.which("ffprobe"):
+        return None
+    komut = ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+              "-of", "default=noprint_wrappers=1:nokey=1", yol]
+    try:
+        calisti = subprocess.run(komut, capture_output=True, timeout=15, text=True)
+        return float(calisti.stdout.strip())
+    except (subprocess.TimeoutExpired, OSError, ValueError):
+        return None
+
+
+def video_uret(fotograf_yollari, cikti_onek, ses_dosyasi=None):
     """Gerçek fotoğraflardan ffmpeg ile yumuşak yakınlaşmalı slayt videosu (1080x1920, mp4).
+    `ses_dosyasi` verilirse kare süresi seslendirmenin uzunluğuna göre ayarlanır (2-6 sn/kare
+    arasında sınırlı) ve ses videoya eklenir; verilmezse sabit 3 sn/kare, sessiz üretilir.
     `ffmpeg` yoksa ya da bir adım başarısız olursa None döner — sessizce atlanır, uydurmaz."""
     if not fotograf_yollari or not shutil.which("ffmpeg"):
         return None
     genislik, yukseklik = FORMATLAR["9x16"]
-    sure_kare, fps = 3, 25
-    kare_sayisi = sure_kare * fps
+    fps = 25
+    kare_adedi = min(len(fotograf_yollari), 4)
+    sure_kare = 3.0
+    if ses_dosyasi:
+        ses_suresi = _ses_suresi(ses_dosyasi)
+        if ses_suresi:
+            sure_kare = max(2.0, min(6.0, ses_suresi / kare_adedi))
+    kare_sayisi = round(sure_kare * fps)
     with tempfile.TemporaryDirectory(prefix="urun-video-") as gecici:
         klipler = []
-        for i, yol in enumerate(fotograf_yollari[:4]):  # azami 4 kare, video çok uzamasın
+        for i, yol in enumerate(fotograf_yollari[:kare_adedi]):
             kirpilmis = kirp(yol, genislik, yukseklik)
             kare_dosyasi = Path(gecici) / f"kare-{i}.jpg"
             kirpilmis.save(kare_dosyasi, "JPEG", quality=92)
@@ -119,15 +165,30 @@ def video_uret(fotograf_yollari, cikti_onek):
             klipler.append(klip)
         liste_dosyasi = Path(gecici) / "liste.txt"
         liste_dosyasi.write_text("".join(f"file '{k}'\n" for k in klipler))
-        cikti = f"{cikti_onek}-video.mp4"
-        Path(cikti).parent.mkdir(parents=True, exist_ok=True)
+        sessiz = Path(gecici) / "sessiz.mp4"
         komut = ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(liste_dosyasi),
-                 "-c", "copy", cikti]
+                 "-c", "copy", str(sessiz)]
         try:
             calisti = subprocess.run(komut, capture_output=True, timeout=60)
         except (subprocess.TimeoutExpired, OSError):
             return None
-        return cikti if calisti.returncode == 0 else None
+        if calisti.returncode != 0:
+            return None
+        cikti = f"{cikti_onek}-video.mp4"
+        Path(cikti).parent.mkdir(parents=True, exist_ok=True)
+        if not ses_dosyasi:
+            shutil.copyfile(sessiz, cikti)
+            return cikti
+        komut = ["ffmpeg", "-y", "-i", str(sessiz), "-i", ses_dosyasi, "-c:v", "copy",
+                 "-c:a", "aac", "-shortest", cikti]
+        try:
+            calisti = subprocess.run(komut, capture_output=True, timeout=60)
+        except (subprocess.TimeoutExpired, OSError):
+            return None
+        if calisti.returncode == 0:
+            return cikti
+        shutil.copyfile(sessiz, cikti)  # ses eklenemedi, sessiz video yine de teslim edilir
+        return cikti
 
 
 def _istek(url, veri=None):
@@ -204,6 +265,7 @@ def main(argv):
         print(__doc__)
         return 1
     kod, veri_dosyasi, cikti_onek = argv[0], argv[1], argv[2]
+    anlatim = argv[argv.index("--anlatim") + 1] if "--anlatim" in argv[:-1] else None
     ayar.ortam_yukle()
     urun = _urun_bul(veri_dosyasi, kod)
     if not urun:
@@ -221,7 +283,11 @@ def main(argv):
         return 1
     sonuc = {"kod": kod, "kaynak_fotograf_sayisi": len(fotograf_yollari)}
     sonuc.update(formatlari_uret(fotograf_yollari, cikti_onek))
-    sonuc["video"] = video_uret(fotograf_yollari, cikti_onek) or "atlandı (ffmpeg yok ya da üretim başarısız)"
+    ses_dosyasi = sesli_anlatim_uret(anlatim, cikti_onek)
+    sonuc["seslendirme"] = ses_dosyasi or (
+        "atlandı (edge-tts kurulu değil — pip install edge-tts)" if anlatim else "atlandı (--anlatim verilmedi)")
+    sonuc["video"] = (video_uret(fotograf_yollari, cikti_onek, ses_dosyasi)
+                       or "atlandı (ffmpeg yok ya da üretim başarısız)")
     sonuc["sahne"] = (sahne_uret(fotograf_yollari[0], cikti_onek, urun.get("ana_kategori"))
                        or "atlandı (FAL_KEY yok ya da üretim başarısız/zaman aşımı)")
     print(json.dumps(sonuc, ensure_ascii=False, indent=2))

@@ -43,12 +43,14 @@ Girdi: `python3 bin/urun_veri_cek.py` — `.env` içindeki `NIDA_XML_URL`'den (S
    Ayrıca bilgi amaçlı (fırsat değil, taslak üretilmez): **stok tükendi** — önceki `stok > 0`,
    bu hafta `stok == 0`. Her satırda kaynak veri dosyasının yolu köşeli parantezde durur;
    veride olmayan sayı yazılmaz.
-3. Her fırsat (stok uyarısı hariç) için önce `python3 bin/urun_gorsel_uret.py <kod> <veri dosyası>
-   cikti/YYYY-Www-<kod>` çalıştır — beslemedeki gerçek fotoğraflardan 1:1/4:5/9:16 kırpma + kısa
-   video (ve varsa FAL_KEY ile dekoratif sahne) üretir, hiçbiri zorunlu değil (üretilemeyen format
-   "atlandı" döner, taslağa öyle yazılır). Sonra `skills/urun-pazarlama-metni/SKILL.md` şablonuyla
-   `cikti/YYYY-Www-<kod>-taslak.md` dosyasına, üretilen görsel/video dosya yollarıyla birlikte
-   taslak gönderiyi yaz.
+3. Her fırsat (stok uyarısı hariç) için önce `skills/urun-pazarlama-metni/SKILL.md`'nin 1-3.
+   adımlarıyla 2-3 cümlelik tanıtım metnini yaz. Sonra `python3 bin/urun_gorsel_uret.py <kod>
+   <veri dosyası> cikti/YYYY-Www-<kod> --anlatim "<az önce yazılan 2-3 cümle>"` çalıştır —
+   beslemedeki gerçek fotoğraflardan 1:1/4:5/9:16 kırpma + kısa video (varsa `edge-tts` ile aynı
+   metnin seslendirmesi, videoya eklenir; varsa `FAL_KEY` ile dekoratif sahne) üretir, hiçbiri
+   zorunlu değil (üretilemeyen format "atlandı" döner, taslağa öyle yazılır — **ikinci bir metin
+   uydurulmaz**, `--anlatim`'e verilen zaten tek metindir). Sonra `cikti/YYYY-Www-<kod>-taslak.md`
+   dosyasına, üretilen görsel/video/seslendirme dosya yollarıyla birlikte taslak gönderiyi yaz.
 4. `cikti/YYYY-Www-rapor.md` yaz: fırsat türüne göre gruplanmış özet tablo + her taslağın dosya
    yolu + stok uyarıları listesi.
 5. **Çekim gerekiyor** bölümü — bütçe/fırsat şartından bağımsız, **her koşuda** çalışır (yalnız veri
@@ -70,8 +72,10 @@ Adım 3'te okunur:
 ## Girdi kaynakları
 - `takimlar/urun-pazarlama/veri/YYYY-Www.json` — çekicinin çıktısı (aynı hafta üzerine yazar)
 - `python3 bin/urun_veri_cek.py` — SoftTr XML beslemesi, anahtar `NIDA_XML_URL`
-- `python3 bin/urun_gorsel_uret.py <kod> <veri> <cikti-onek>` — beslemedeki gerçek fotoğraflardan
-  1:1/4:5/9:16 kırpma + video, varsa `FAL_KEY` ile dekoratif sahne (ürünün kendisi hiç değişmez)
+- `python3 bin/urun_gorsel_uret.py <kod> <veri> <cikti-onek> --anlatim "<metin>"` — beslemedeki
+  gerçek fotoğraflardan 1:1/4:5/9:16 kırpma + video, varsa `FAL_KEY` ile dekoratif sahne (ürünün
+  kendisi hiç değişmez), varsa `edge-tts` ile verilen metnin seslendirmesi (kurulu değilse video
+  sessiz üretilir — akış bloklanmaz)
 - `sirket/KURUMSAL-BILGILER.md` — unvan, adres, vergi no, iletişim, marka adı (yasal ibare gerektiğinde)
 - `durum.json` kuyruğu — `not-` ile başlayan bekleyen maddeler patronundur, önce onlar
 
@@ -86,8 +90,9 @@ Adım 3'te okunur:
 `cikti/YYYY-Www-<kod>-taslak.md`:
 - ürün adı, fırsat türü, kaynaklı fiyat/indirim (varsa)
 - kısa pazarlama metni (taslak, yayınlanmaz)
-- görsel/video notu (üretilen `-1x1.jpg`/`-4x5.jpg`/`-9x16.jpg`/`-video.mp4`/varsa `-sahne.jpg`
-  dosya yolları; üretilemeyen biri "atlandı" notuyla geçilir, uydurma dosya yolu yazılmaz)
+- görsel/video/seslendirme notu (üretilen `-1x1.jpg`/`-4x5.jpg`/`-9x16.jpg`/`-video.mp4`/varsa
+  `-sahne.jpg`/`-seslendirme.mp3` dosya yolları; üretilemeyen biri "atlandı" notuyla geçilir,
+  uydurma dosya yolu yazılmaz)
 - kapanış çağrısı
 
 ## Asla
@@ -96,6 +101,9 @@ Adım 3'te okunur:
 - İlk koşuda (kıyaslanacak önceki veri yokken) fırsat uydurmaz — yalnız "ilk koşu" der.
 - Yasal ibare, adres, telefon, vergi no tahmin etmez — yalnız `sirket/KURUMSAL-BILGILER.md`'den alır.
 - `Aciklama` alanını birebir kopyalayıp kendi metniymiş gibi sunmaz.
-- Üretilemeyen (fotoğraf/video/sahne "atlandı" dönen) bir görseli üretilmiş gibi taslağa yazmaz.
+- Üretilemeyen (fotoğraf/video/sahne/seslendirme "atlandı" dönen) bir görseli üretilmiş gibi
+  taslağa yazmaz.
+- Seslendirme için taslak metninden başka bir cümle uydurmaz — `--anlatim`'e verilen zaten
+  taslaktaki tek metindir, ikinci bir versiyon yazılmaz.
 - Gerçek ürün fotoğrafını yapay zekayla değiştirmez/yeniden çizmez — yalnız arka plan/sahne
   katmanı `FAL_KEY` ile üretilebilir, ürünün kendisi hep gerçek fotoğraftır.
