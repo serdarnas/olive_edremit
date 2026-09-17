@@ -1,9 +1,19 @@
 {
   "takim": "marka-izleme",
-  "son_kosu": null,
-  "son_sonuc": null,
-  "kuyruk": [],
-  "bekci": { "son_karar": null, "red_sayisi_7g": 0 },
-  "defter_son_ders": null,
-  "sayaclar": {}
+  "son_kosu": "2026-09-17T17:48:41+03:00",
+  "son_sonuc": "tamam",
+  "kuyruk": [
+    {
+      "id": "mi-2026-W38",
+      "durum": "tamam"
+    }
+  ],
+  "bekci": {
+    "son_karar": "kabul",
+    "red_sayisi_7g": 0,
+    "gerekce": "[bekçi aynı aileden — uyarı] Koşu kaydı ANAYASA ve kurallar.md'ye uygun. Arama tavanı 6/6 tutulmuş (WebFetch ayrı, açıkça bildirilmiş). Bütçe $0.65/$2 altında, mesai 17:48 (09–23 içinde), zaman tavanı 15 dk altında. Bahis yok (temiz hafta) — raporlanabilir kullanıcı bahsi Web ve X'te bulunamadı; sikayetvar.com sayfası çekildi, içeriği boş doğrulandı. Deftere ders eklendi (insight, kural değil). Key leak yok, asla yapmaz maddeleri ihlal edilmemiş, kaynaksız sayı yoktur.",
+    "zaman": "2026-09-17T17:51:58+03:00"
+  },
+  "defter_son_ders": "reseller-ve-genel-icerik-sayfalari-bahis-sayilmaz",
+  "sayaclar": { "arama": 6, "web_bahis": 0, "x_bahis": 0, "dikkat": 0 }
 }
