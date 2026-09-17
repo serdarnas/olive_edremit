@@ -27,7 +27,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ayar  # noqa: E402
-from PIL import Image  # noqa: E402
+from PIL import Image, ImageFilter, ImageOps  # noqa: E402
 
 KUYRUK = "https://queue.fal.run"
 MODEL = "fal-ai/nano-banana-pro"
@@ -156,6 +156,20 @@ def _sahne_bekle(is_, sure=BEKLEME_SN):
     return None
 
 
+def _duz_fon_sil(urun_rgba, alt_esik=200, ust_esik=245):
+    """Ürünü açık/düz renkli stüdyo fonundan ayırır (basit parlaklık eşiği + kenar yumuşatma).
+    Ürünün pikselleri hiç değişmez, yalnız etrafındaki neredeyse-beyaz fon saydamlaştırılır.
+    Mükemmel değildir (çok açık renkli ambalajın kendi kenarları da incelebilir) — bu yüzden
+    sahne dosyası taslak sayılır, insan yayınlamadan önce gözden geçirir."""
+    gri = ImageOps.grayscale(urun_rgba)
+    lut = [255 if deger <= alt_esik else (0 if deger >= ust_esik else
+           round(255 * (ust_esik - deger) / (ust_esik - alt_esik))) for deger in range(256)]
+    alfa = gri.point(lut).filter(ImageFilter.GaussianBlur(2))
+    kesilmis = urun_rgba.copy()
+    kesilmis.putalpha(alfa)
+    return kesilmis
+
+
 def sahne_uret(fotograf_yolu, cikti_onek, baglam=None):
     """Yalnız dekoratif arka plan üretir (fal), GERÇEK ürün fotoğrafını üstüne bindirir.
     Herhangi bir adımda hata/zaman aşımı olursa None döner — ürün asla AI ile çizilmez."""
@@ -175,7 +189,7 @@ def sahne_uret(fotograf_yolu, cikti_onek, baglam=None):
         return None
     zemin = kirp(sahne_ham, genislik, yukseklik).convert("RGBA")
     with Image.open(fotograf_yolu) as urun_gorseli:
-        urun = urun_gorseli.convert("RGBA")
+        urun = _duz_fon_sil(urun_gorseli.convert("RGBA"))
         oran = min((genislik * 0.7) / urun.width, (yukseklik * 0.45) / urun.height)
         urun = urun.resize((round(urun.width * oran), round(urun.height * oran)), Image.LANCZOS)
     konum = ((genislik - urun.width) // 2, yukseklik - urun.height - round(yukseklik * 0.08))

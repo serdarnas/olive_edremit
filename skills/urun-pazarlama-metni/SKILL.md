@@ -48,7 +48,8 @@ kullanılmaz — ürünün XML'de olmayan bir özelliği (ör. hasat yılı, men
 Fiyat: <fiyat> <para_birimi>[, %<indirim_oran> indirimle <indirim> <para_birimi>]
 Görseller: <1x1 dosya> · <4x5 dosya> · <9x16 dosya> (üretilemeyen "atlandı")
 Video: <video dosyası ya da "atlandı">
-Sahne: <sahne dosyası ya da "atlandı">
+Sahne: <sahne dosyası ya da "atlandı"> — üretildiyse "yayından önce gözden geçir (otomatik fon
+  silme kusurlu olabilir)" notunu ekle
 
 İncele: nidazeytin.com
 ```
