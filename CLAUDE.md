@@ -6,6 +6,8 @@
 - **x-icerik** — Telegram'dan gelen X linkini doğrular, iddia tablosu + karar yazar.
 - **youtube-analiz** — haftalık video ve yorum verisini çeker, rapor çıkarır.
 - **twitter-icerik** — doğrulanmış konudan X Article paketi kurar.
+- **urun-pazarlama** — haftalık ürün XML beslemesini geçen haftayla kıyaslar, fırsat raporu ve taslak gönderiler çıkarır.
+- **marka-izleme** — haftalık web ve X'te marka bahislerini tarar, tona göre sınıflar, dikkat gerektirenleri öne çıkarır.
 - **bekçi** (`bin/bekci.py`) — Stop hook'ta her koşuyu denetler; red verirse ajan aynı oturumda düzeltir.
 - **dağıtıcı** (`bin/dagitici.py`) — zinciri kurar (x-icerik → twitter-icerik). Takımlar birbirine mesaj atmaz.
 - **dinleyici** (`bin/telegram_dinle.py`) — bota mesaj düştüğü an x-icerik koşar; olay tetikli, zamanlayıcısız.

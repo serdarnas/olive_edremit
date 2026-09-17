@@ -93,6 +93,7 @@ Komut komut ayrıntılı hâli: **[KURULUM.md](KURULUM.md)**
 | `FAL_KEY` | 3840×736 kapak görseli | pakete "kapak: sen ekleyeceksin" notu düşer, koşu devam eder |
 | `OPENAI_API_KEY` | Bekçi — ayrı model ailesi (ANAYASA §3) | **yoksa ya da geçersizse** (401/403, ağ yok) yedek yol `claude -p --model haiku`; karar "bekçi aynı aileden — uyarı" notuyla kaydedilir |
 | `KANAL` | İzlenecek YouTube kanalı | `@ornek-kanal` varsayılır |
+| `NIDA_XML_URL` | Ürün XML beslemesi (bkz. `sirket/KURUMSAL-BILGILER.md`, gizli değil) | `urun-pazarlama` koşmaz |
 | `NVIDIA_API_KEY` | Ajanı Anthropic yerine NVIDIA'nın bedava modeliyle koşturmak ([docs/07](docs/07-farkli-model.md)) | hiçbir şey değişmez; her takım Anthropic'te koşar |
 | `NIM_MODEL` | Koşacak NIM modeli (tool-use desteklemeli) | `takim.md`'deki `model:` satırı kullanılır; o da yoksa `saglayici: nim` koşusu atlanır |
 

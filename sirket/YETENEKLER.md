@@ -1,6 +1,6 @@
 # YETENEKLER — A Şirketi
 
-> Üç takımın kullandığı sekiz yeteneğin kataloğu.
+> Beş takımın kullandığı on yeteneğin kataloğu.
 > Bir yetenek, o işin nasıl yapılacağını adım adım, şablonuyla ve kontrol listesiyle anlatan tek dosyadır:
 > `skills/<ad>/SKILL.md`. Ajan koşu adımında **yalnızca ilgili yeteneği** okur.
 
@@ -27,8 +27,10 @@
 | `twitter-icerik` | [`anlati-kurgusu`](../skills/anlati-kurgusu/SKILL.md)                                       | İşin içindeki gerçek hikâyeyi bulur ve üç beatlik yaya oturtur; hikâye uydurmayı yasaklar.      | [social-media-skills/skills · skills/storytelling-and-narrative/SKILL.md](https://github.com/social-media-skills/skills/blob/main/skills/storytelling-and-narrative/SKILL.md)                                   | MIT    |
 | `twitter-icerik` | [`zincir-yazimi`](../skills/zincir-yazimi/SKILL.md)                                         | X zinciri ve lansman postu yazar; tek post daha güçlüyse bunu söyler.                           | [social-media-skills/skills · skills/thread-writer/SKILL.md](https://github.com/social-media-skills/skills/blob/main/skills/thread-writer/SKILL.md)                                                             | MIT    |
 | `twitter-icerik` | [`kaynak-dogrulama`](../skills/kaynak-dogrulama/SKILL.md)                                   | Her iddiayı birincil kaynağa açıp ✅/🟡/⛔ ile sınıflar.                                          | kendi üretimimiz                                                                                                                                                                                                | —      |
+| `urun-pazarlama` | [`urun-pazarlama-metni`](../skills/urun-pazarlama-metni/SKILL.md)                           | Bir ürün fırsatını veri satırından taslak sosyal medya gönderisine çevirir, sayı uydurmaz.       | kendi üretimimiz                                                                                                                                                                                                | —      |
+| `marka-izleme`   | [`marka-bahis-siniflandirma`](../skills/marka-bahis-siniflandirma/SKILL.md)                 | Bir marka bahsini ton ve dikkat rozetiyle sınıflar, kaynaklı rapor satırına çevirir.              | kendi üretimimiz                                                                                                                                                                                                | —      |
 
-**Toplam 8 yetenek, 3 takım.**
+**Toplam 10 yetenek, 5 takım.**
 
 ## Nereden aldık
 
@@ -38,7 +40,8 @@
 | [petar-nauka/fact-check-skill](https://github.com/petar-nauka/fact-check-skill) | Fact-checking ve kanıt defteri | MIT | 1 |
 | [jamditis/claude-skills-journalism](https://github.com/jamditis/claude-skills-journalism) | Gazetecilik: doğrulama ve kaynak | MIT | 1 |
 
-`kaynak-dogrulama` ve `x-article-format` bu kitin kendi üretimidir; dış kaynağı yoktur.
+`kaynak-dogrulama`, `x-article-format`, `urun-pazarlama-metni` ve `marka-bahis-siniflandirma` bu kitin
+kendi üretimidir; dış kaynağı yoktur.
 
 Dışarıdan alınan her yetenek dosyasının sonunda **`## Kaynak ve değişiklikler`** bölümü var:
 orijinalden ne alındı, ne değiştirildi. Değişikliklerin ortak yönü:

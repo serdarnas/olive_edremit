@@ -30,7 +30,11 @@ GUNLER = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", 
 # Haftalık iş — sabah tetiği bu maddeyi kuyruğa düşürmezse dağıtıcı o takımı hiç başlatmaz.
 # `gun`: haftanın günü (0 = pazartesi). Hafta kimliği `youtube_analiz_cek.hafta_dosyasi` ile aynı.
 HAFTALIK = [{"takim": "youtube-analiz", "gun": 0, "id": "yt-{hafta}",
-             "not": "haftalık kanal raporu — son 7 gün"}]
+             "not": "haftalık kanal raporu — son 7 gün"},
+            {"takim": "urun-pazarlama", "gun": 1, "id": "up-{hafta}",
+             "not": "haftalık ürün fırsat raporu — XML beslemesi kıyası"},
+            {"takim": "marka-izleme", "gun": 2, "id": "mi-{hafta}",
+             "not": "haftalık marka bahis taraması — web ve X"}]
 
 KOSU_ADI = re.compile(r"^(\d{4}-\d{2}-\d{2})-(\d{2})(\d{2})\.md$")
 OZET_SATIRI = re.compile(r"^- maliyet:\s*([\d.]+)\s*USD\s*·\s*tur:\s*(\d+)\s*·\s*hata:\s*(\w+)", re.M)

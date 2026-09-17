@@ -22,7 +22,7 @@ cp .env.example .env
 head -1 .gitignore     # ".env" — anahtar dosyası hiçbir zaman commit'e girmez
 ```
 
-`.env`'i kendi editöründe aç ve doldur. Sekiz anahtarın hiçbiri zorunlu değil ama boş kalan her
+`.env`'i kendi editöründe aç ve doldur. 9 anahtarın hiçbiri zorunlu değil ama boş kalan her
 anahtar bir takımı kapatır:
 
 | Anahtar | Nereden alınır | Boşsa |
@@ -33,6 +33,7 @@ anahtar bir takımı kapatır:
 | `FAL_KEY` | fal.ai → Keys | paket "kapak: sen ekleyeceksin" notuyla çıkar |
 | `OPENAI_API_KEY` | platform.openai.com | **yoksa ya da geçersizse** bekçi Haiku'ya düşer, kararına "bekçi aynı aileden — uyarı" notu eklenir |
 | `KANAL` | izlemek istediğin YouTube kanalı (`@kanal`) | `@ornek-kanal` varsayılır |
+| `NIDA_XML_URL` | ürün XML beslemesi (bkz. `sirket/KURUMSAL-BILGILER.md`, gizli değil) | `urun-pazarlama` koşmaz |
 | `NVIDIA_API_KEY` | build.nvidia.com → model kartı → Get API Key | hiçbir şey değişmez; her takım Anthropic'te koşar ([docs/07](docs/07-farkli-model.md)) |
 | `NIM_MODEL` | koşacak NIM modeli, tool-use desteklemeli | `takim.md`'deki `model:` satırı kullanılır; o da yoksa `saglayici: nim` koşusu atlanır |
 
