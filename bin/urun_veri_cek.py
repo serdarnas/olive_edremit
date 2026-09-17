@@ -31,18 +31,18 @@ def _metin(urun, etiket):
     return (urun.findtext(etiket) or "").strip() or None
 
 
-def _ilk_resim(urun):
+def _resimler(urun):
+    """`Resimler` altındaki dolu `ResimN` etiketlerinin tümü, sırayla — beslemede zaten var olan
+    ama eskiden atılan 2.-6. fotoğraflar da dahil (bkz. defter.md: görsel/video eksikliği dersi)."""
     kapsayici = urun.find("Resimler")
     if kapsayici is None:
-        return None
-    for cocuk in kapsayici:
-        if cocuk.text and cocuk.text.strip():
-            return cocuk.text.strip()
-    return None
+        return []
+    return [cocuk.text.strip() for cocuk in kapsayici if cocuk.text and cocuk.text.strip()]
 
 
 def urun_esle(urun):
     """XML `<Urun>` düğümü → sade şema. Besleme dışı hiçbir alan eklenmez, uydurulmaz."""
+    resimler = _resimler(urun)
     return {"kod": _metin(urun, "Kod"), "barkod": _metin(urun, "Barkod"),
             "baslik": _metin(urun, "Baslik"), "kategori": _metin(urun, "Kategori"),
             "ana_kategori": _metin(urun, "AnaKategori"),
@@ -50,7 +50,8 @@ def urun_esle(urun):
             "indirim_oran": _sayi(_metin(urun, "IndirimOran")),
             "para_birimi": _metin(urun, "ParaBirimi") or "TL",
             "stok": int(_sayi(_metin(urun, "Stok")) or 0),
-            "durum": _metin(urun, "Durum") == "1", "resim": _ilk_resim(urun)}
+            "durum": _metin(urun, "Durum") == "1",
+            "resim": resimler[0] if resimler else None, "resimler": resimler}
 
 
 def xml_cek(url):

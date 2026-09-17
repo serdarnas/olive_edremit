@@ -26,7 +26,10 @@ kullanılmaz — ürünün XML'de olmayan bir özelliği (ör. hasat yılı, men
    hiç bahsetme — "kampanyalı" gibi belirsiz ifadeyle telafi etme.
 3. `Aciklama` alanı elindeyse (veri dosyasında yoksa bu adımı atla) yalnız **ilham** al: iki-üç
    cümlelik özgün bir tanıtım metni yaz, cümleleri veya kalıpları birebir kopyalama.
-4. `resim` alanı varsa URL'ini "Görsel:" notu olarak ekle; yoksa "görsel yok" yaz, uydurma link kurma.
+4. `bin/urun_gorsel_uret.py`'nin ürettiği dosya yollarını (varsa) "Görseller:" (1:1/4:5/9:16),
+   "Video:" ve varsa "Sahne:" satırları olarak ekle; bir format üretilemediyse ("atlandı" döndüyse)
+   o satıra "atlandı" yaz, uydurma dosya yolu kurma. Hiç üretim çalıştırılmadıysa (veri dosyasında
+   `resim` bile yoksa) "görsel yok" yaz.
 5. Yasal ibare ya da iletişim bilgisi (vergi no, telefon, adres) gerekiyorsa yalnız
    `sirket/KURUMSAL-BILGILER.md`'den al; orada yoksa o satırı boş bırak, tahmin etme.
 6. Kapanışı sabit çağrıyla bitir: "İncele: nidazeytin.com" — başka bir link uydurma (XML'de ürün
@@ -43,7 +46,9 @@ kullanılmaz — ürünün XML'de olmayan bir özelliği (ör. hasat yılı, men
 <2-3 cümlelik tanıtım metni>
 
 Fiyat: <fiyat> <para_birimi>[, %<indirim_oran> indirimle <indirim> <para_birimi>]
-Görsel: <resim URL'i ya da "görsel yok">
+Görseller: <1x1 dosya> · <4x5 dosya> · <9x16 dosya> (üretilemeyen "atlandı")
+Video: <video dosyası ya da "atlandı">
+Sahne: <sahne dosyası ya da "atlandı">
 
 İncele: nidazeytin.com
 ```
@@ -54,6 +59,9 @@ Görsel: <resim URL'i ya da "görsel yok">
 - Yasal ibare / iletişim bilgisini `sirket/KURUMSAL-BILGILER.md` dışından tahmin etmek.
 - Ürün sayfası, kampanya kodu ya da indirim linki uydurmak — XML'de yok.
 - "Sınırlı stok", "son gün" gibi veri satırında karşılığı olmayan aciliyet ifadeleri eklemek.
+- Gerçek ürün fotoğrafını yapay zekayla değiştirmek/yeniden çizmek — yalnız arka plan/sahne
+  katmanı üretken modelden gelebilir, ürünün kendisi hep gerçek fotoğraf kalır.
+- `bin/urun_gorsel_uret.py`'nin "atlandı" döndürdüğü bir formatı üretilmiş gibi sunmak.
 
 ## Öğrenilenler
 Bu skill koşuda aldığı veriyle **kendini geliştirir**: her koşudan sonra ne işe yaradığını ve nerede
