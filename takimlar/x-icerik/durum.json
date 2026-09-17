@@ -1,12 +1,21 @@
 {
   "takim": "x-icerik",
-  "son_kosu": null,
-  "son_sonuc": null,
-  "kuyruk": [],
+  "son_kosu": "2026-09-17T19:34:17+03:00",
+  "son_sonuc": "tamam",
+  "kuyruk": [
+    {
+      "id": "x-327454729",
+      "durum": "tamam"
+    }
+  ],
   "bekci": {
-    "son_karar": null,
-    "red_sayisi_7g": 0
+    "son_karar": "kabul",
+    "red_sayisi_7g": 0,
+    "gerekce": "[bekçi aynı aileden — uyarı] Koşu ANAYASA Madde 1-5 ve x-icerik kurallarına uygun. İddiaların tamamı etikeli (5× ✅, 1× 🟡 tam hak), kaynaklar birincil (marmarabirlik.com.tr) ve ikincil (WebSearch) ile doğrulanmış. Görüntülenme sayısı 🟡 olarak işaretlenip çıktıya yazılmamış (kural: ayna veri her zaman 🟡). Sosyal hesaba yazma, kaynaksız sayı, anahtar verisi, kişisel veri yok. Bütçe 0.58 USD (tavan 2 USD), süre tavan aşılmadı. Defter güncellendi.",
+    "zaman": "2026-09-17T19:38:26+03:00"
   },
-  "defter_son_ders": null,
-  "sayaclar": {}
+  "defter_son_ders": "gelen-linksiz-mesajlar-islendi-sayilir",
+  "sayaclar": {
+    "telegram_son_update": 327454729
+  }
 }

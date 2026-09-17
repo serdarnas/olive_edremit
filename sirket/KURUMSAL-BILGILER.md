@@ -19,6 +19,14 @@
 - **Web sitesi:** https://www.nidazeytin.com
 - **Facebook:** https://www.facebook.com/nidazeytin
 - **Instagram:** https://www.instagram.com/nidazeytiin/
+  — dikkat: alan adıyla (`nidazeytin`) birebir uyuşmuyor (çift "i" — `nidazeytiin`); yanlış yazım
+  değilse buradaki gibi kalsın, ama bir kez teyit edilmeli.
+- **LinkedIn:** https://www.linkedin.com/company/111129317/
+  — verilen link yönetici panosuydu (`/admin/dashboard/`); herkese açık şirket sayfası linkine
+  indirgendi. Varsa gerçek vanity-URL (ör. `/company/nida-zeytin/`) ile değiştirilebilir.
+- **X (Twitter):** https://x.com/nidazeytin
+- **TikTok:** henüz herkese açık içerik hesabı yok — geliştirici uygulaması onay bekliyor
+  (bkz. `.env.example` TIKTOK_* anahtarları). Hesap açılınca link buraya eklenir.
 - **Google işletme profili:** https://maps.app.goo.gl/Tc1DcebKaPHpvymf8
   — yorum içeriği otomatik çekilmez (Google Haritalar yorumları JS ile yüklenir); `marka-izleme`
   raporunda yalnız bu link referans olarak basılır, "yorumları elle kontrol et" notuyla.

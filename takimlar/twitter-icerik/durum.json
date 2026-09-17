@@ -1,9 +1,18 @@
 {
   "takim": "twitter-icerik",
-  "son_kosu": null,
-  "son_sonuc": null,
-  "kuyruk": [],
-  "bekci": { "son_karar": null, "red_sayisi_7g": 0 },
-  "defter_son_ders": null,
+  "son_kosu": "2026-09-17T19:38:45+03:00",
+  "son_sonuc": "tamam",
+  "kuyruk": [
+    {
+      "id": "aci-327454729",
+      "durum": "tamam",
+      "not": "Paket üretilmedi: Marmarabirlik alım fiyatı açıklaması tek olay/tek gözlem — sistem kurulumu ya da reçete yok (x-article-format §1). Article değil, post malzemesi. Bakılan kaynak: takimlar/x-icerik/cikti/2026-09-17-327454729-tarimyazari.md."
+    }
+  ],
+  "bekci": {
+    "son_karar": null,
+    "red_sayisi_7g": 0
+  },
+  "defter_son_ders": "tek-olay-aciklamasi-article-degil",
   "sayaclar": {}
 }
