@@ -1,9 +1,23 @@
 {
   "takim": "urun-pazarlama",
-  "son_kosu": null,
-  "son_sonuc": null,
-  "kuyruk": [],
-  "bekci": { "son_karar": null, "red_sayisi_7g": 0 },
-  "defter_son_ders": null,
-  "sayaclar": {}
+  "son_kosu": "2026-09-17T17:40:55+03:00",
+  "son_sonuc": "tamam",
+  "kuyruk": [
+    {
+      "id": "up-2026-W38",
+      "durum": "tamam"
+    }
+  ],
+  "bekci": {
+    "son_karar": "kabul",
+    "red_sayisi_7g": 0,
+    "gerekce": "[bekçi aynı aileden — uyarı] Koşu kaydı tüm anayasa ve takım kurallarına uygun. Kaynaksız sayı yok (53 ürün [veri/2026-W38.json] ile etiketlenmiş); kişi/e-posta/anahtar kaydedilmemiş; 'asla yapmaz' maddeleri ihlal edilmemiş (ilk koşu protokolü uygulanmış — önceki hafta dosyası yokken taslak/fırsat üretilmemiş); kaydın tüm metrikleri yazılı (ürün: 53, fırsat: 0, taslak: 0, maliyet tahmini); sosyal medyaya yazılmamış; durum.json güncellenmiş. Tavanlara (09:00–23:00, ~5 dk, 2 USD tavan) uyulmuş.",
+    "zaman": "2026-09-17T17:43:09+03:00"
+  },
+  "defter_son_ders": "ilk-kosu-fircing-genisligi",
+  "sayaclar": {
+    "urun": 53,
+    "firsat": 0,
+    "taslak": 0
+  }
 }

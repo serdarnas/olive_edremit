@@ -47,7 +47,9 @@ Girdi: `python3 bin/urun_veri_cek.py` — `.env` içindeki `NIDA_XML_URL`'den (S
    `cikti/YYYY-Www-<kod>-taslak.md` dosyasına tek bir taslak gönderi yaz.
 4. `cikti/YYYY-Www-rapor.md` yaz: fırsat türüne göre gruplanmış özet tablo + her taslağın dosya
    yolu + stok uyarıları listesi.
-5. `durum.json` kuyruğuna `up-<hafta>` maddesi ekle ve durumunu `tamam` yap.
+5. `durum.json` kuyruğuna `{"id": "up-<hafta>", "durum": "tamam"}` ekle — alan adı **`id`** olmalı
+   (`madde` değil); `bin/gunluk.py` ve `bin/dagitici.py` aynı haftanın tekrar kuyruğa düşmesini bu
+   alandan anlar.
 6. `defter.md`'ye en fazla **bir** ders (ders yoksa ekleme).
 7. Koşu kaydını `SIRKET_KOSU` yoluna yaz: kaç ürün, kaç fırsat (türe göre), kaç taslak, dosya
    yolları, maliyet.

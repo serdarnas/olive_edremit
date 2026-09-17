@@ -42,7 +42,9 @@ genel web linkleri için `WebFetch`. Geçmiş koşularda görülen linkler
    girer — içerik çekilmeye çalışılmaz (Google Haritalar yorumları JS ile yüklenir, erişilemez).
 6. `cikti/YYYY-Www-rapor.md` yaz (bkz. Çıktı sözleşmesi).
 7. `veri/gorulenler.json`'u bu koşuda bulunan yeni linklerle güncelle (üzerine ekle, eskiyi silme).
-8. `durum.json` kuyruğuna `mi-<hafta>` ekle ve durumunu `tamam` yap.
+8. `durum.json` kuyruğuna `{"id": "mi-<hafta>", "durum": "tamam"}` ekle — alan adı **`id`** olmalı
+   (`madde` değil); `bin/gunluk.py` ve `bin/dagitici.py` aynı haftanın tekrar kuyruğa düşmesini bu
+   alandan anlar.
 9. `defter.md`'ye en fazla **bir** ders (ders yoksa ekleme).
 10. Koşu kaydını `SIRKET_KOSU` yoluna yaz: kaç arama, kaç yeni bahis (kaynağa göre), kaç dikkat
     etiketli, maliyet.
