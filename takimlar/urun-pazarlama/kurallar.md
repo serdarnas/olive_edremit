@@ -23,3 +23,8 @@
 - Her fırsat satırında veri dosyası referansı ve fırsat türü etiketi.
 - Her taslak gönderi tek dosya, tek fırsata bağlı, kaynağı belli.
 - Koşu kaydında kaç ürün, kaç fırsat (türe göre), kaç taslak, maliyet yazılı.
+
+- Fiyat/indirim etiketi ve altyazı yalnız veri dosyasındaki/taslak metnindeki bilgiyi gösterir;
+  Remotion bileşeni hiçbir sayı ya da cümle uydurmaz.
+- Node/Remotion (`video-uretici/`) kurulu değilse gelişmiş video adımı sessizce atlanır, temel
+  video (ffmpeg) ve sessiz/altyazısız akış etkilenmez.

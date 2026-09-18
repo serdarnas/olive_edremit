@@ -101,6 +101,47 @@ def formatlari_uret(fotograf_yollari, cikti_onek):
     return sonuc
 
 
+_KELIME_SRT_BETIGI = r"""
+import asyncio, sys
+import edge_tts
+
+async def main():
+    metin, ses, mp3_yolu, srt_yolu = sys.argv[1:5]
+    iletisim = edge_tts.Communicate(metin, ses, boundary="WordBoundary")
+    olusturucu = edge_tts.SubMaker()
+    with open(mp3_yolu, "wb") as ses_dosyasi:
+        async for parca in iletisim.stream():
+            if parca["type"] == "audio":
+                ses_dosyasi.write(parca["data"])
+            elif parca["type"] == "WordBoundary":
+                olusturucu.feed(parca)
+    with open(srt_yolu, "w", encoding="utf-8") as srt_dosyasi:
+        srt_dosyasi.write(olusturucu.get_srt())
+
+asyncio.run(main())
+"""
+
+
+def _edge_tts_python():
+    """`edge-tts` konsol betiğinin shebang satırından kurulduğu (pipx/venv) python
+    yorumlayıcısını bulur. CLI'nin `--write-subtitles`'ı sabit cümle-bazlı altyazı üretir
+    (`Communicate`'in varsayılanı `boundary="SentenceBoundary"`); kelime-bazlı altyazı için
+    kütüphaneye `boundary="WordBoundary"` ile doğrudan erişmek gerekiyor. Bulunamazsa None döner
+    — çağıran taraf CLI'nin cümle-bazlı altyazısına düşer, hiçbir zaman çökmez."""
+    yol = shutil.which("edge-tts")
+    if not yol:
+        return None
+    try:
+        ilk_satir = Path(yol).open(encoding="utf-8", errors="ignore").readline().strip()
+    except OSError:
+        return None
+    if ilk_satir.startswith("#!"):
+        yorumlayici = ilk_satir[2:].strip().split()[0]
+        if Path(yorumlayici).exists():
+            return yorumlayici
+    return None
+
+
 def sesli_anlatim_uret(metin, cikti_onek, ses="tr-TR-EmelNeural"):
     """`edge-tts` (MIT, ücretsiz, API anahtarı gerekmez) ile Türkçe seslendirme + kelime zamanlı
     altyazı (.srt) üretir — `bin/urun_video_render.py`'nin (Remotion) kelime-kelime altyazısı
@@ -112,6 +153,19 @@ def sesli_anlatim_uret(metin, cikti_onek, ses="tr-TR-EmelNeural"):
     yol = f"{cikti_onek}-seslendirme.mp3"
     srt_yol = f"{cikti_onek}-altyazi.srt"
     Path(yol).parent.mkdir(parents=True, exist_ok=True)
+
+    yorumlayici = _edge_tts_python()
+    if yorumlayici:
+        komut = [yorumlayici, "-c", _KELIME_SRT_BETIGI, metin, ses, yol, srt_yol]
+        try:
+            calisti = subprocess.run(komut, capture_output=True, timeout=30)
+        except (subprocess.TimeoutExpired, OSError):
+            calisti = None
+        if calisti is not None and calisti.returncode == 0 and Path(yol).exists():
+            return yol
+
+    # Kelime-bazlı yol kullanılamadı (yorumlayıcı bulunamadı ya da betik başarısız oldu) — CLI'nin
+    # cümle-bazlı altyazısına düş, yine de bir seslendirme üretilmiş olsun.
     komut = ["edge-tts", "--voice", ses, "--text", metin, "--write-media", yol,
              "--write-subtitles", srt_yol]
     try:
