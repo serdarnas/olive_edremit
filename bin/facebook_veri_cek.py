@@ -8,7 +8,7 @@ Kullanım:
 Bu dosyada **hiçbir POST/publish/ads uç noktası çağrılmaz** — yalnız `urllib.request.urlopen` ile
 GET isteği atılır, başka hiçbir HTTP metodu kullanılmaz (ANAYASA §1: hiçbir takım sosyal hesaba
 yazamaz). `FACEBOOK_ACCESS_TOKEN` `.env`'de yoksa boş liste dönüp sessizce çıkar — koşuyu bloklamaz
-(bkz. `FAL_KEY`'in twitter-icerik'teki "boş bırakılabilir" deseni).
+(bkz. `GEMINI_API_KEY`'in twitter-icerik'teki "boş bırakılabilir" deseni).
 
 `FACEBOOK_PAGE_ID` / `INSTAGRAM_BUSINESS_ID` `.env`'de boşsa `/me/accounts` ve
 `{page-id}?fields=instagram_business_account` çağrılarıyla keşfedilir; bulunursa `--kendini-sina`

@@ -226,23 +226,25 @@ python3 bin/youtube_analiz_cek.py --son-7g --yorum 10 --azami-video 10
 
 ---
 
-## `FAL_KEY` yok — kapak ne olacak
+## `GEMINI_API_KEY` yok — kapak ne olacak
 
 **Belirti.** `python3 bin/kapak_uret.py …` → çıkış kodu **2** ve
-`kapak üretilmedi: FAL_KEY yok — pakete 'kapak: sen ekleyeceksin' notu düş`.
+`kapak üretilmedi: GEMINI_API_KEY yok — pakete 'kapak: sen ekleyeceksin' notu düş`.
 Ya da çıkış kodu **1** ve `kapak üretilemedi — pakete 'kapak: sen ekleyeceksin' notu düş`.
 
-**Sebep.** `FAL_KEY` boş (kod 2) ya da üretim başarısız oldu (kod 1): fal işi `FAILED` döndü,
-240 saniyede bitmedi, ya da PIL kurulu değil (`kapak: PIL yok (pip install pillow)`).
+**Sebep.** `GEMINI_API_KEY` boş (kod 2) ya da üretim başarısız oldu (kod 1): Google Gemini API
+hata döndü (ör. bakiye/prepay tükendi), zaman aşımına uğradı, ya da PIL kurulu değil
+(`kapak: PIL yok (pip install pillow)`).
 
 **Çözüm.** Bu **koşuyu düşürmeyen** bir durumdur, tasarım böyledir. `twitter-icerik` takımının
 adım 4'ü açıkça söyler: çıkış kodu 2 ise pakete `kapak: sen ekleyeceksin` notunu yaz ve devam et.
 Çıktı sözleşmesi de buna göredir: *"`kapak.png` 3840×736 **ya da** pakette 'kapak: sen
 ekleyeceksin' notu — ikisinden biri mutlaka."*
 
-Kapağı gerçekten üretmek isterseniz: `.env` → `FAL_KEY` (fal.ai → Keys) ve
-`pip install pillow`. Başlık fal tarafından değil **yerelde PIL ile** basılır; gerekçesi
-dosyanın başında yazar: üretken modeller Türkçe metni ve noktalama işaretlerini bozuyor.
+Kapağı gerçekten üretmek isterseniz: `.env` → `GEMINI_API_KEY` (aistudio.google.com → Get API key,
+ücretsiz alınır, kullanım başına ücretli) ve `pip install pillow`. Başlık Gemini tarafından değil
+**yerelde PIL ile** basılır; gerekçesi dosyanın başında yazar: üretken modeller Türkçe metni ve
+noktalama işaretlerini bozuyor.
 
 ---
 

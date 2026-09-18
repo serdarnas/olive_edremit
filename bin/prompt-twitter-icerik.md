@@ -32,7 +32,7 @@ kontrol listesi. Otorite budur.
    `h2, h3, p, strong, em, s, ul, ol, li, blockquote, a, hr`. Sayfanın kendi notları o alanın dışındadır.
    Görsel henüz yoksa `[GÖRSEL n: …]` işaret satırı `<p>` olarak kalır.
 3. **Kapak** — `python3 bin/kapak_uret.py "<başlık>" takimlar/twitter-icerik/cikti/<tarih>-<slug>/kapak.png`
-   Çıkış 0 → 3840×736 kapak hazır. Çıkış 2 (FAL_KEY yok) ya da 1 → dosya yoktur; `00-BURADAN-BASLA.md`
+   Çıkış 0 → 3840×736 kapak hazır. Çıkış 2 (GEMINI_API_KEY yok) ya da 1 → dosya yoktur; `00-BURADAN-BASLA.md`
    içine **`kapak: sen ekleyeceksin`** satırını yaz ve devam et. Anahtarı okumaya, basmaya çalışma.
 4. **`00-BURADAN-BASLA.md`** — `Başlık:` (6-12 kelime, gövdede geçmez), yedek başlık, kapak durumu,
    **YAYIN GÜNÜ adımları** (kapağı yükle → `article.html`'i tarayıcıda aç, 📋 ile kopyala, X Article

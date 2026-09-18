@@ -30,7 +30,7 @@ anahtar bir takımı kapatır:
 | `TELEGRAM_BOT_TOKEN` | Telegram'da @BotFather → `/newbot` | `x-icerik` koşmaz |
 | `TELEGRAM_CHAT_ID` | aşağıdaki `--chat-id-bul` | `x-icerik` koşmaz |
 | `APIFY_TOKEN` | apify.com → Settings → API tokens | `youtube-analiz` koşmaz |
-| `FAL_KEY` | fal.ai → Keys | paket "kapak: sen ekleyeceksin" notuyla çıkar |
+| `GEMINI_API_KEY` | aistudio.google.com → Get API key (kapak + ürün sahnesi için) | paket "kapak: sen ekleyeceksin" notuyla çıkar |
 | `OPENAI_API_KEY` | platform.openai.com | **yoksa ya da geçersizse** bekçi Haiku'ya düşer, kararına "bekçi aynı aileden — uyarı" notu eklenir |
 | `KANAL` | izlemek istediğin YouTube kanalı (`@kanal`) | `@ornek-kanal` varsayılır |
 | `NIDA_XML_URL` | ürün XML beslemesi (bkz. `sirket/KURUMSAL-BILGILER.md`, gizli değil) | `urun-pazarlama` koşmaz |
@@ -47,7 +47,7 @@ python3 bin/telegram_oku.py --chat-id-bul
 Çıkan sayıyı `TELEGRAM_CHAT_ID`'ye yaz. Bu filtre olmadan bota yazan herkesin mesajı işlenirdi;
 bu yüzden yalnız o chat id'den gelen mesajlar okunur.
 
-`APIFY_TOKEN`, `FAL_KEY` ve `OPENAI_API_KEY` opsiyoneldir — üçü boşken de döngü döner.
+`APIFY_TOKEN`, `GEMINI_API_KEY` ve `OPENAI_API_KEY` opsiyoneldir — üçü boşken de döngü döner.
 
 > **`.env` her zaman kabuğu ezer.** Kabuğunda aynı adla eski bir değer duruyorsa bile koşu
 > `.env`'deki değeri kullanır — dosyaya ne yazdıysan onu görürsün (`bin/ayar.py` → `ortam_yukle`).

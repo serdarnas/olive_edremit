@@ -7,16 +7,17 @@ Kullanım:
 Kullanım (isteğe bağlı seslendirmeyle):
   python3 bin/urun_gorsel_uret.py <kod> <veri/YYYY-Www.json> <cikti-onek> --anlatim "<metin>"
 
-Çıktı: <cikti-onek>-1x1.jpg, -4x5.jpg, -9x16.jpg, -video.mp4, (FAL_KEY varsa) -9x16-sahne.jpg,
+Çıktı: <cikti-onek>-1x1.jpg, -4x5.jpg, -9x16.jpg, -video.mp4, (GEMINI_API_KEY varsa) -9x16-sahne.jpg,
 (--anlatim + edge-tts kuruluysa) -seslendirme.mp3 + -altyazi.srt (ses videoya eklenir; SRT ise
 `bin/urun_video_render.py` (Remotion) tarafından kelime-kelime altyazı için okunur)
 
 Deterministik kısım (fotoğraf kırpma + video) her zaman çalışır, hiçbir üretken model kullanmaz —
 yalnız beslemedeki gerçek fotoğraflar kırpılır/birleştirilir. Yalnız **sahne** (arka plan) katmanı
-`FAL_KEY` ile üretilir ve GERÇEK ürün fotoğrafı bunun üstüne bindirilir — ürünün kendisi hiçbir
-zaman yapay zekayla çizilmez/değiştirilmez (bkz. `bin/kapak_uret.py`, aynı ilke: AI yalnız zemin
-çizer). `FAL_KEY` yoksa, üretim başarısız/zaman aşımına uğrarsa ya da `ffmpeg` yoksa ilgili adım
-sessizce atlanır — koşu bloklanmaz, çıktıda "atlandı" notuyla devam eder.
+Google Gemini API (`GEMINI_API_KEY`, `gemini-3.1-flash-image` / "Nano Banana 2") ile üretilir ve
+GERÇEK ürün fotoğrafı bunun üstüne bindirilir — ürünün kendisi hiçbir zaman yapay zekayla
+çizilmez/değiştirilmez (bkz. `bin/kapak_uret.py`, aynı ilke ve aynı `GEMINI_API_KEY` — ayrı takım,
+ortak anahtar). `GEMINI_API_KEY` yoksa, üretim başarısız/zaman aşımına uğrarsa ya da `ffmpeg` yoksa
+ilgili adım sessizce atlanır — koşu bloklanmaz, çıktıda "atlandı" notuyla devam eder.
 
 Seslendirme `edge-tts` (MIT, ücretsiz, API anahtarı gerekmez — `pip install edge-tts`) ile
 üretilir; bu projedeki `pip install` gerektiren ikinci istisna (birincisi Pillow), aynı nazik-atlama
@@ -29,7 +30,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -39,9 +39,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ayar  # noqa: E402
 from PIL import Image, ImageFilter, ImageOps  # noqa: E402
 
-KUYRUK = "https://queue.fal.run"
-MODEL = "fal-ai/nano-banana-pro"
-BEKLEME_SN = 90  # kapak_uret.py'den kısa tutuldu: koşu başına azami 2 çağrı, ANAYASA §4 zaman tavanı
+GEMINI_MODEL = "gemini-3.1-flash-image"
+GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions"
+GEMINI_ZAMAN_ASIMI_SN = 60
 FORMATLAR = {"1x1": (1080, 1080), "4x5": (1080, 1350), "9x16": (1080, 1920)}
 SAHNE_STIL = (" — fine engraved illustration on warm aged paper, muted ink browns with one warm "
               "accent colour, soft vignette, rustic olive branch and wood table, absolutely no "
@@ -250,33 +250,47 @@ def video_uret(fotograf_yollari, cikti_onek, ses_dosyasi=None):
         return cikti
 
 
-def _istek(url, veri=None):
+def _gemini_sahne_iste(prompt):
+    """Google Gemini Interactions API'ye TEK senkron istek — fal.ai'nin kuyruk+yoklama akışının
+    aksine, üretilen görsel taban64 olarak doğrudan yanıtta döner, ayrı bir "sonucu bekle" adımı
+    yok. Herhangi bir hata/zaman aşımında None döner — sessizce atlanır, script çökmez."""
+    import base64
+
+    gövde = {
+        "model": GEMINI_MODEL,
+        "input": prompt,
+        "response_format": {"type": "image", "mime_type": "image/jpeg",
+                             "aspect_ratio": "9:16", "image_size": "2K"},
+    }
     istek = urllib.request.Request(
-        url, data=json.dumps(veri).encode() if veri is not None else None,
-        headers={"Authorization": f"Key {os.environ.get('FAL_KEY', '')}",
+        GEMINI_ENDPOINT, data=json.dumps(gövde).encode(),
+        headers={"x-goog-api-key": os.environ.get("GEMINI_API_KEY", ""),
                  "Content-Type": "application/json"})
-    with urllib.request.urlopen(istek, timeout=180) as yanit:
-        return json.loads(yanit.read())
+    try:
+        with urllib.request.urlopen(istek, timeout=GEMINI_ZAMAN_ASIMI_SN) as yanit:
+            sonuc = json.loads(yanit.read())
+    except (urllib.error.URLError, OSError, ValueError):
+        return None
 
-
-def _sahne_bekle(is_, sure=BEKLEME_SN):
-    """Kuyruğu yoklar. `urllib.error.HTTPError` da `URLError`'ın alt sınıfı olduğu için tek
-    except bloğu her iki `_istek` çağrısını da (durum + sonuç) kapsar — fal.ai geçici bir hata
-    (ör. 403/5xx) döndürürse script çökmez, None ile sessizce atlanır."""
-    biter = time.time() + sure
-    while time.time() < biter:
-        try:
-            durum_yaniti = _istek(is_["status_url"])
-            durum = durum_yaniti.get("status")
-            if durum == "COMPLETED":
-                sonuc = _istek(is_["response_url"])
-                return (sonuc.get("images") or [{}])[0].get("url")
-            if durum in ("FAILED", "ERROR"):
-                return None
-        except (urllib.error.URLError, OSError, ValueError, KeyError):
-            pass
-        time.sleep(4)
-    return None
+    # Yanıt şekli sürüm/uca göre değişebilir (`output_image` ya da `output` listesi içinde bir
+    # görsel bloğu) — ikisini de dener, hiçbirini bulamazsa None döner.
+    taban64 = None
+    if isinstance(sonuc.get("output_image"), dict):
+        taban64 = sonuc["output_image"].get("data")
+    if not taban64:
+        for ogun in sonuc.get("output") or []:
+            if isinstance(ogun, dict) and ogun.get("type") == "image":
+                taban64 = (ogun.get("image") or {}).get("data") or ogun.get("data")
+                if taban64:
+                    break
+    if not taban64:
+        return None
+    try:
+        ham = Path(tempfile.mkstemp(prefix="urun-sahne-", suffix=".jpg")[1])
+        ham.write_bytes(base64.b64decode(taban64))
+        return ham
+    except (ValueError, OSError):
+        return None
 
 
 def _duz_fon_sil(urun_rgba, alt_esik=200, ust_esik=245):
@@ -294,20 +308,12 @@ def _duz_fon_sil(urun_rgba, alt_esik=200, ust_esik=245):
 
 
 def sahne_uret(fotograf_yolu, cikti_onek, baglam=None):
-    """Yalnız dekoratif arka plan üretir (fal), GERÇEK ürün fotoğrafını üstüne bindirir.
-    Herhangi bir adımda hata/zaman aşımı olursa None döner — ürün asla AI ile çizilmez."""
-    if not os.environ.get("FAL_KEY"):
+    """Yalnız dekoratif arka plan üretir (Google Gemini API), GERÇEK ürün fotoğrafını üstüne
+    bindirir. Herhangi bir adımda hata/zaman aşımı olursa None döner — ürün asla AI ile çizilmez."""
+    if not os.environ.get("GEMINI_API_KEY"):
         return None
     genislik, yukseklik = FORMATLAR["9x16"]
-    try:
-        is_ = _istek(f"{KUYRUK}/{MODEL}", {"prompt": (baglam or SAHNE_VARSAYILAN) + SAHNE_STIL,
-                                            "aspect_ratio": "9:16", "resolution": "2K", "num_images": 1})
-    except (urllib.error.URLError, OSError, ValueError):
-        return None
-    url = _sahne_bekle(is_)
-    if not url:
-        return None
-    sahne_ham = _indir(url)
+    sahne_ham = _gemini_sahne_iste((baglam or SAHNE_VARSAYILAN) + SAHNE_STIL)
     if not sahne_ham:
         return None
     zemin = kirp(sahne_ham, genislik, yukseklik).convert("RGBA")
@@ -351,7 +357,7 @@ def main(argv):
     sonuc["video"] = (video_uret(fotograf_yollari, cikti_onek, ses_dosyasi)
                        or "atlandı (ffmpeg yok ya da üretim başarısız)")
     sonuc["sahne"] = (sahne_uret(fotograf_yollari[0], cikti_onek, urun.get("ana_kategori"))
-                       or "atlandı (FAL_KEY yok ya da üretim başarısız/zaman aşımı)")
+                       or "atlandı (GEMINI_API_KEY yok ya da üretim başarısız/zaman aşımı)")
     print(json.dumps(sonuc, ensure_ascii=False, indent=2))
     return 0
 

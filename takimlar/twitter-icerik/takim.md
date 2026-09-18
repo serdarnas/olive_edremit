@@ -32,8 +32,8 @@ Girdi: `durum.json` kuyruğunda dağıtıcının düşürdüğü `aci-<id>` madd
    **Tablodaki ⛔ iddia yazıya girmez.**
 3. `article.html` üret — tek dosya, en üstte 📋 kopyala butonu.
 4. `python3 bin/kapak_uret.py "<başlık>" <paket>/kapak.png` ile kapağı üret (3840×736).
-   Çıkış kodu 2 ise (`FAL_KEY` yok) pakete **"kapak: sen ekleyeceksin"** notunu yaz ve devam et —
-   hata verme, koşuyu düşürme.
+   Çıkış kodu 2 ise (`GEMINI_API_KEY` yok) pakete **"kapak: sen ekleyeceksin"** notunu yaz ve
+   devam et — hata verme, koşuyu düşürme.
 5. Günde en fazla **bir** paket. Paket bittiğinde kuyruk maddesini `tamam` yap, `not` alanına
    paket klasörünün yolunu yaz. Konu yoksa paket üretme, sebebini koşu kaydına yaz.
 6. `defter.md`'ye en fazla **bir** ders (ders yoksa ekleme).

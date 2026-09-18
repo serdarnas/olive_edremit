@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """X Article kapağı üretir — 3840×736 (5,2:1), tek satır başlık.
 
-Hibrit yol: fal (`nano-banana-pro`) **yalnızca zemini** çizer (metinsiz), başlık zeminin üstüne
-yerelde PIL ile basılır. Gerekçe: üretken modeller Türkçe metni, tırnakları ve noktalama işaretlerini
-bozuyor; kapak başlığı pazarlık konusu değil.
+Hibrit yol: Google Gemini API (`gemini-3.1-flash-image`, "Nano Banana 2") **yalnızca zemini**
+çizer (metinsiz), başlık zeminin üstüne yerelde PIL ile basılır. Gerekçe: üretken modeller
+Türkçe metni, tırnakları ve noktalama işaretlerini bozuyor; kapak başlığı pazarlık konusu değil.
 
 Kullanım:
   python3 bin/kapak_uret.py "<başlık>" <cikti.png> [--zemin "<İngilizce sahne tarifi>"]
 
-Çıkış kodları: 0 üretildi · 2 FAL_KEY yok · 1 üretilemedi.
+Çıkış kodları: 0 üretildi · 2 GEMINI_API_KEY yok · 1 üretilemedi.
 2 ve 1 durumunda çağıran pakete **"kapak: sen ekleyeceksin"** notunu yazar ve devam eder.
-FAL_KEY yalnızca ortamdan okunur; hiçbir çıktıya, kayda, deftere yazılmaz.
+GEMINI_API_KEY yalnızca ortamdan okunur; hiçbir çıktıya, kayda, deftere yazılmaz.
 """
+import base64
 import json
 import os
 import sys
 import tempfile
-import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -24,10 +24,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ayar  # noqa: E402
 
-KUYRUK = "https://queue.fal.run"
-MODEL = "fal-ai/nano-banana-pro"
+GEMINI_MODEL = "gemini-3.1-flash-image"
+GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/interactions"
+GEMINI_ZAMAN_ASIMI_SN = 120
 DENEMELER = (("21:9", "4K"), ("21:9", "2K"), ("16:9", "2K"))
-BEKLEME_SN = 240
 GENISLIK, YUKSEKLIK = 3840, 736
 METIN_ALANI = 0.52      # sol yarı metne, sağ yarı görsele
 KENAR = 170
@@ -44,48 +44,56 @@ YEDEK_FONTLAR = ("/System/Library/Fonts/Supplemental/Georgia Bold.ttf",
                  "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf")
 
 
-def _istek(url, veri=None):
+def _gemini_istek(prompt, oran, cozunurluk):
+    """Google Gemini Interactions API'ye tek senkron istek — üretilen görsel taban64 olarak
+    doğrudan yanıtta döner, fal.ai'nin kuyruk+yoklama akışı gerekmiyor. Hata/zaman aşımında
+    None döner, sıradaki oran/çözünürlük denemesine geçilir."""
+    gövde = {
+        "model": GEMINI_MODEL,
+        "input": prompt,
+        "response_format": {"type": "image", "mime_type": "image/jpeg",
+                             "aspect_ratio": oran, "image_size": cozunurluk},
+    }
     istek = urllib.request.Request(
-        url, data=json.dumps(veri).encode() if veri is not None else None,
-        headers={"Authorization": f"Key {os.environ.get('FAL_KEY', '')}",
+        GEMINI_ENDPOINT, data=json.dumps(gövde).encode(),
+        headers={"x-goog-api-key": os.environ.get("GEMINI_API_KEY", ""),
                  "Content-Type": "application/json"})
-    with urllib.request.urlopen(istek, timeout=180) as yanit:
-        return json.loads(yanit.read())
+    try:
+        with urllib.request.urlopen(istek, timeout=GEMINI_ZAMAN_ASIMI_SN) as yanit:
+            sonuc = json.loads(yanit.read())
+    except urllib.error.HTTPError as exc:
+        print(f"kapak: {oran}/{cozunurluk} kabul edilmedi (HTTP {exc.code}), sıradaki denenecek",
+              file=sys.stderr)
+        return None
+    except (urllib.error.URLError, OSError, ValueError) as exc:
+        print(f"kapak: {oran}/{cozunurluk} kabul edilmedi ({type(exc).__name__}), sıradaki denenecek",
+              file=sys.stderr)
+        return None
 
-
-def _bekle(is_, sure=BEKLEME_SN):
-    """Kuyruk işi bitene kadar yoklar; üretilen görselin URL'ini döner, olmazsa None."""
-    biter = time.time() + sure
-    while time.time() < biter:
-        try:
-            durum = _istek(is_["status_url"]).get("status")
-        except (urllib.error.URLError, OSError, ValueError, KeyError):
-            time.sleep(4)
-            continue
-        if durum == "COMPLETED":
-            sonuc = _istek(is_["response_url"])
-            return (sonuc.get("images") or [{}])[0].get("url")
-        if durum in ("FAILED", "ERROR"):
-            print("kapak: fal üretimi başarısız", file=sys.stderr)
-            return None
-        time.sleep(4)
-    print(f"kapak: {sure} sn içinde bitmedi", file=sys.stderr)
-    return None
+    taban64 = None
+    if isinstance(sonuc.get("output_image"), dict):
+        taban64 = sonuc["output_image"].get("data")
+    if not taban64:
+        for ogun in sonuc.get("output") or []:
+            if isinstance(ogun, dict) and ogun.get("type") == "image":
+                taban64 = (ogun.get("image") or {}).get("data") or ogun.get("data")
+                if taban64:
+                    break
+    if not taban64:
+        return None
+    try:
+        ham = Path(tempfile.mkstemp(prefix="kapak-ham-", suffix=".jpg")[1])
+        ham.write_bytes(base64.b64decode(taban64))
+        return ham
+    except (ValueError, OSError):
+        return None
 
 
 def zemin_uret(prompt):
-    """Kabul edilen ilk oran/çözünürlükle zemini üretir, indirir, geçici dosya yolunu döner."""
+    """Kabul edilen ilk oran/çözünürlükle zemini üretir, geçici dosya yolunu döner."""
     for oran, cozunurluk in DENEMELER:
-        try:
-            is_ = _istek(f"{KUYRUK}/{MODEL}", {"prompt": prompt, "aspect_ratio": oran,
-                                               "resolution": cozunurluk, "num_images": 1})
-        except (urllib.error.URLError, OSError, ValueError) as exc:
-            print(f"kapak: {oran}/{cozunurluk} kabul edilmedi ({type(exc).__name__}), sıradaki denenecek")
-            continue
-        url = _bekle(is_)
-        if url:
-            ham = Path(tempfile.mkstemp(prefix="kapak-ham-", suffix=".png")[1])
-            urllib.request.urlretrieve(url, ham)
+        ham = _gemini_istek(prompt, oran, cozunurluk)
+        if ham:
             return ham
     return None
 
@@ -144,8 +152,9 @@ def main(argv):
     if len(argv) < 2:
         print(__doc__)
         return 1
-    if not os.environ.get("FAL_KEY"):
-        print("kapak üretilmedi: FAL_KEY yok — pakete 'kapak: sen ekleyeceksin' notu düş", file=sys.stderr)
+    if not os.environ.get("GEMINI_API_KEY"):
+        print("kapak üretilmedi: GEMINI_API_KEY yok — pakete 'kapak: sen ekleyeceksin' notu düş",
+              file=sys.stderr)
         return 2
     zemin = argv[argv.index("--zemin") + 1] if "--zemin" in argv[:-1] else None
     yol = uret(argv[0], argv[1], zemin)

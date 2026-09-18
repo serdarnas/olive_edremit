@@ -16,7 +16,7 @@ Bu bir iskelettir, bir ürün değil. Klonla, `.env`'i doldur, kendi takımları
 |---|---|---|
 | **x-icerik** | `TELEGRAM_BOT_TOKEN` · `TELEGRAM_CHAT_ID` | Telegram'a attığın X linki → `gelen/*.json` → her iddia ✅/🟡/⛔ etiketli doğrulama tablosu + "yazıya değer mi" kararı (`cikti/YYYY-MM-DD-<update_id>-<hesap>.md`) |
 | **youtube-analiz** | `APIFY_TOKEN` · `KANAL` | Apify aktörleri → `veri/YYYY-Www.json` → yalnız o dosyadaki sayılarla kaynaklı haftalık rapor (`cikti/YYYY-Www-rapor.md`) |
-| **twitter-icerik** | — (`FAL_KEY` varsa kapak) | Dağıtıcının düşürdüğü `aci-<id>` maddesi → X Article paketi: `article.md`, `article.html`, `kapak.png` (`cikti/<tarih>-<slug>/`) |
+| **twitter-icerik** | — (`GEMINI_API_KEY` varsa kapak) | Dağıtıcının düşürdüğü `aci-<id>` maddesi → X Article paketi: `article.md`, `article.html`, `kapak.png` (`cikti/<tarih>-<slug>/`) |
 
 Her takım `takimlar/<takim>/` altında aynı dört dosyayla yaşar: `takim.md` (kim ve ne yapar),
 `kurallar.md` (neye göre), `defter.md` (ne öğrendi), `durum.json` (nerede). Her ajan koşuya aynı
@@ -90,7 +90,7 @@ Komut komut ayrıntılı hâli: **[KURULUM.md](KURULUM.md)**
 | `TELEGRAM_BOT_TOKEN` | Bot gelen kutusu (@BotFather) | `x-icerik` koşmaz, "eksik anahtar" der |
 | `TELEGRAM_CHAT_ID` | Yalnızca senin mesajların işlensin | aynı |
 | `APIFY_TOKEN` | YouTube videoları + yorumları | `youtube-analiz` koşmaz |
-| `FAL_KEY` | 3840×736 kapak görseli | pakete "kapak: sen ekleyeceksin" notu düşer, koşu devam eder |
+| `GEMINI_API_KEY` | 3840×736 kapak görseli + ürün sahnesi (Google Gemini API) | pakete "kapak: sen ekleyeceksin" notu düşer, koşu devam eder |
 | `OPENAI_API_KEY` | Bekçi — ayrı model ailesi (ANAYASA §3) | **yoksa ya da geçersizse** (401/403, ağ yok) yedek yol `claude -p --model haiku`; karar "bekçi aynı aileden — uyarı" notuyla kaydedilir |
 | `KANAL` | İzlenecek YouTube kanalı | `@ornek-kanal` varsayılır |
 | `NIDA_XML_URL` | Ürün XML beslemesi (bkz. `sirket/KURUMSAL-BILGILER.md`, gizli değil) | `urun-pazarlama` koşmaz |

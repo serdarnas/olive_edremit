@@ -47,7 +47,7 @@ Girdi: `python3 bin/urun_veri_cek.py` — `.env` içindeki `NIDA_XML_URL`'den (S
    adımlarıyla 2-3 cümlelik tanıtım metnini yaz. Sonra `python3 bin/urun_gorsel_uret.py <kod>
    <veri dosyası> cikti/YYYY-Www-<kod> --anlatim "<az önce yazılan 2-3 cümle>"` çalıştır —
    beslemedeki gerçek fotoğraflardan 1:1/4:5/9:16 kırpma + kısa video (varsa `edge-tts` ile aynı
-   metnin seslendirmesi, videoya eklenir; varsa `FAL_KEY` ile dekoratif sahne) üretir, hiçbiri
+   metnin seslendirmesi, videoya eklenir; varsa `GEMINI_API_KEY` ile dekoratif sahne) üretir, hiçbiri
    zorunlu değil (üretilemeyen format "atlandı" döner, taslağa öyle yazılır — **ikinci bir metin
    uydurulmaz**, `--anlatim`'e verilen zaten tek metindir). Sonra `python3
    bin/urun_video_render.py <kod> <veri dosyası> cikti/YYYY-Www-<kod>` çalıştır — Node/Remotion
@@ -78,7 +78,7 @@ Adım 3'te okunur:
 - `takimlar/urun-pazarlama/veri/YYYY-Www.json` — çekicinin çıktısı (aynı hafta üzerine yazar)
 - `python3 bin/urun_veri_cek.py` — SoftTr XML beslemesi, anahtar `NIDA_XML_URL`
 - `python3 bin/urun_gorsel_uret.py <kod> <veri> <cikti-onek> --anlatim "<metin>"` — beslemedeki
-  gerçek fotoğraflardan 1:1/4:5/9:16 kırpma + video, varsa `FAL_KEY` ile dekoratif sahne (ürünün
+  gerçek fotoğraflardan 1:1/4:5/9:16 kırpma + video, varsa `GEMINI_API_KEY` ile dekoratif sahne (ürünün
   kendisi hiç değişmez), varsa `edge-tts` ile verilen metnin seslendirmesi (kurulu değilse video
   sessiz üretilir — akış bloklanmaz)
 - `python3 bin/urun_video_render.py <kod> <veri> <cikti-onek>` — Remotion (`video-uretici/`) ile
@@ -114,6 +114,6 @@ Adım 3'te okunur:
 - Seslendirme için taslak metninden başka bir cümle uydurmaz — `--anlatim`'e verilen zaten
   taslaktaki tek metindir, ikinci bir versiyon yazılmaz.
 - Gerçek ürün fotoğrafını yapay zekayla değiştirmez/yeniden çizmez — yalnız arka plan/sahne
-  katmanı `FAL_KEY` ile üretilebilir, ürünün kendisi hep gerçek fotoğraftır.
+  katmanı `GEMINI_API_KEY` ile üretilebilir, ürünün kendisi hep gerçek fotoğraftır.
 - Gelişmiş videodaki fiyat/indirim etiketinde veri dosyasında olmayan bir sayı göstermez —
   `urun_video_render.py`'ye yalnız `veri/YYYY-Www.json`'daki `fiyat`/`indirim`/`indirim_oran` gider.
